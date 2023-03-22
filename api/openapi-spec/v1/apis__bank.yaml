@@ -1,0 +1,447 @@
+openapi: 3.0.3
+info:
+  title: Bank Application API
+  description: >
+    OpenApi specification for bank application
+    
+    ___
+    
+    Using this api user can create, update, delete, retrive banks and accounts
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    name: Fattesingh Rane
+    email: ranefattesingh@gmail.com
+    url: ranefattesingh.github.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+servers:
+  - url: '{protocol}://{environment}.example.com/v1'
+    variables: 
+      environment:
+        default: api
+        enum:
+          - api
+          - api.dev
+          - api.stagging
+      protocol:
+        default: https
+        enum:
+          - https
+          - http
+tags:
+  - name: bank
+    description: Everything about bank
+  - name: account
+    description: Everything about account
+paths:
+  /bank:
+    post:
+      tags:
+        - bank
+      summary: Create a bank
+      description: Creates a bank
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bank'
+      responses:
+        '201':
+          description: ID of created bank
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/CreateBankResponse'
+        '400':
+          description: Invalid request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - bank
+      summary: Retrives all banks satisfying filter criteria
+      description: Retrives all banks satisfying filter criteria, if no filter criteria is given then all banks are returned.
+      responses:
+        '200':
+          description: List of bank satisfying the filter criteria
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/ListBankResponse'
+        '400':
+          description: Server received bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server couldn't handle the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /bank/{bankId}:  
+    get:
+      tags:
+        - bank
+      summary: Retrives bank by id
+      description: Retrives bank by id
+      parameters:
+        - name: bankId
+          in: path
+          required: true
+          description: bankId to be retrived
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Retrived bank details for bankId
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/GetBankResponse'
+        '400':
+          description: Server received bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: bankId does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server couldn't handle the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      
+    put:
+      tags:
+        - bank
+      summary: Update bank details by id
+      description: Update entire bank details by id
+      parameters:
+        - name: bankId
+          in: path
+          required: true
+          description: bankId to be updated
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Bank details are updated successfully
+        '400':
+          description: Server received bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: BankId does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server couldn't handle the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - bank
+      summary: Deletes bank by id
+      description: Deletes bank by id
+      parameters:
+        - name: bankId
+          in: path
+          required: true
+          description: bankId to be deleted
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: deleted bank details for bankId
+        '400':
+          description: Server received bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: bankId does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server couldn't handle the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /bank/{bankId}/account:
+    post:
+      tags:
+        - account
+      summary: Create a account under a bank
+      description: Creates a account under a bank
+      parameters:
+        - name: bankId
+          in: path
+          required: true
+          description: bankId under which account needs to be created
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        '201':
+          description: ID of created bank
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/CreateAccountResponse'
+        '400':
+          description: Invalid request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Bank does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse' 
+
+  /bank/{bankId}/account/{accountId}:              
+    get:
+      tags:
+        - account
+      summary: Retrives an account under a bank
+      description: Retrived an account under a bank
+      parameters:
+        - name: bankId
+          in: path
+          required: true
+          description: bankId under which account needs to be retrived
+          schema:
+            type: string
+            format: uuid
+        - name: accountId
+          in: path
+          required: true
+          description: accountId to be retrived
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Account details for requested bank and account id
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/GetAccountResponse'
+        '400':
+          description: Invalid request error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Bank or account does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse' 
+                
+components:
+  schemas:
+    Bank:
+      type: object
+      properties:
+        id: 
+          type: string
+          format: uuid
+          description: Unique identifier for the bank
+        bankName:
+          type: string
+          description: Unique name for the bank
+        ifscCode:
+          type: string
+          description: Unique branch code
+        branchName:
+          type: string
+          description: Unique branch name
+      required:
+        - bankName
+        - ifscCode
+        - branchName
+        
+    Account:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          description: Unique identifier for the account
+        bankName:
+          type: string
+          description: Bank name for the account
+        branchName:
+          type: string
+          description: Branch name associated with the bank 
+        accountHolderName:
+          type: string
+          description: Name of the account holder
+        identityId:
+          type: string
+          description: Unique identifier for account holder identity
+        firstName:
+          type: string
+          description: First name of the account holder
+        lastName:
+          type: string
+          description: Last name of the account holder
+        address:
+          type: string
+          description: Address of the account holder
+      required:
+        - bankName
+        - branchName
+        - accountHolderName
+        - identityId
+        - firstName
+        - lastName
+        - address
+
+
+    CreateBankResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Response data
+          properties:
+            bankId:
+              type: string
+              format: uuid
+              description: Unique identifier for the bank
+        success:
+          type: boolean
+          description: boolean indicating whether api call was successful or not
+          
+    GetBankResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Response data
+          properties:
+            bank:
+              $ref: '#/components/schemas/Bank'
+        success:
+          type: boolean
+          description: boolean indicating whether api call was successful or not
+          
+    ListBankResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            banks:
+              type: array
+              description: List of bank
+              items:
+                $ref: '#/components/schemas/Bank'
+            totalCount:
+              type: number
+              description: total number of banks satisfying the filter criteria
+            count:
+              type: number
+              description: count of banks retrived
+            size:
+              type: number
+              description: total number of banks
+        success:
+          type: boolean
+          description: boolean indicating whether api call was successful or not
+
+    CreateAccountResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Response data
+          properties:
+            accountId:
+              type: string
+              format: uuid
+              description: Unique identifier for the account
+        success:
+          type: boolean
+          description: boolean indicating whether api call was successful or not
+   
+    GetAccountResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Response data
+          properties:
+            account:
+              $ref: '#/components/schemas/Account'
+        success:
+          type: boolean
+          description: boolean indicating whether api call was successful or not 
+          
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message indicating what went wrong
+        success:
+          type: boolean
+          description: boolean indicating whether api call was not successful
+          default: false
+        

@@ -3,3 +3,6 @@ build:
 
 start:
 	./app
+
+lint:
+	golangci-lint .golangci.yml
